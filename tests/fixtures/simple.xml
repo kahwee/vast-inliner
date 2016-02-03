@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="2.0">
+  <Error><![CDATA[http://example.com/error]]></Error>
+  <Ad id="testing">
+    <InLine>
+      <AdSystem>AdServer</AdSystem>
+      <AdTitle>Title</AdTitle>
+      <Error><![CDATA[http://example.com/1-error]]></Error>
+      <Impression><![CDATA[http://example.com/1-impression1]]></Impression>
+      <Impression><![CDATA[http://example.com/1-impression2]]></Impression>
+      <Impression><![CDATA[http://example.com/1-impression3]]></Impression>
+      <Impression><![CDATA[ImNotAnUrl]]></Impression>
+      <Impression><![CDATA[ ]]></Impression>
+      <Creatives>
+        <Creative id="video">
+          <Linear>
+            <Duration>00:00:10</Duration>
+            <TrackingEvents>
+              <Tracking event="close"><![CDATA[http://example.com/1-close]]></Tracking>
+              <Tracking event="start"><![CDATA[http://example.com/1-start]]></Tracking>
+              <Tracking event="firstQuartile"><![CDATA[http://example.com/1-firstQuartile]]></Tracking>
+              <Tracking event="midpoint"><![CDATA[http://example.com/1-midpoint]]></Tracking>
+              <Tracking event="thirdQuartile"><![CDATA[http://example.com/1-thirdQuartile]]></Tracking>
+              <Tracking event="complete"><![CDATA[http://example.com/1-complete-a]]></Tracking>
+              <Tracking event="complete"><![CDATA[http://example.com/1-complete-b]]></Tracking>
+              <Tracking event="complete"><![CDATA[http://example.com/1-complete-c]]></Tracking>
+              <Tracking event="pause"><![CDATA[http://example.com/1-pause]]></Tracking>
+              <Tracking event="resume"><![CDATA[http://example.com/1-resume]]></Tracking>
+              <Tracking event="progress" offset="00:00:30.000"><![CDATA[http://example.com/1-progress-30sec]]></Tracking>
+              <Tracking event="progress" offset="60%"><![CDATA[http://example.com/1-progress-60%]]></Tracking>
+            </TrackingEvents>
+            <VideoClicks>
+              <ClickTracking><![CDATA[http://example.com/1-clicktracking]]></ClickTracking>
+              <ClickThrough><![CDATA[http://example.com/1-clickthrough]]></ClickThrough>
+              <CustomClick><![CDATA[http://example.com/1-customclick]]></CustomClick>
+            </VideoClicks>
+            <MediaFiles>
+              <MediaFile delivery="progressive" type="video/mp4" bitrate="849" width="512" height="288" scalable="true"><![CDATA[/base/tests/videos/apple-watch.mp4]]></MediaFile>
+            </MediaFiles>
+          </Linear>
+        </Creative>
+        <Creative>
+          <CompanionAds>
+            <Companion width="300" height="60">
+              <StaticResource creativeType="image/jpeg"><![CDATA[http://example.com/static-resource]]></StaticResource>
+              <TrackingEvents>
+                <Tracking event="creativeView"><![CDATA[http://example.com/creativeview]]></Tracking>
+              </TrackingEvents>
+              <CompanionClickThrough><![CDATA[http://example.com/companion-clickthrough]]></CompanionClickThrough>
+            </Companion>
+            <Companion width="300" height="60">
+              <IFrameResource>
+                <![CDATA[http://www.example.com/example.php]]>
+              </IFrameResource>
+              <CompanionClickThrough>
+                http://www.example.com
+              </CompanionClickThrough>
+            </Companion>
+            <Companion width="300" height="60">
+              <HTMLResource>
+                <![CDATA[
+                <a href="http://www.example.com" target="_blank">Some call to action HTML!</a>
+                ]]>
+              </HTMLResource>
+              <CompanionClickThrough>
+                http://www.example.com
+              </CompanionClickThrough>
+            </Companion>
+          </CompanionAds>
+        </Creative>
+      </Creatives>
+    </InLine>
+  </Ad>
+</VAST>

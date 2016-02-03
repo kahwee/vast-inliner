@@ -1,0 +1,16 @@
+<VAST>
+  <Ad sequence="1">
+    <InLine>
+      <AdSystem>KahWee AdSystem</AdSystem>
+      <Creatives>
+        <Creative>
+          <Linear>
+            <MediaFiles>
+              <MediaFile><![CDATA[http://example.com/file.mp4]]></MediaFile>
+            </MediaFiles>
+          </Linear>
+        </Creative>
+      </Creatives>
+    </InLine>
+  </Ad>
+</VAST>
