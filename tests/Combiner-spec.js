@@ -10,13 +10,11 @@ describe('Combiner', function () {
     encoding: 'utf8'
   })
   let dp
-  let xs
   let simpleDom
   let wrapperDom
 
   before(function () {
     dp = new DOMParser()
-    xs = new XMLSerializer()
     simpleDom = dp.parseFromString(simpleContent, 'application/xml')
     wrapperDom = dp.parseFromString(wrapperContent, 'application/xml')
   })
@@ -27,6 +25,5 @@ describe('Combiner', function () {
     c.unshift(simpleDom)
     const newXml = c.execute()
     expect(wrapperDom.querySelectorAll('Creative Linear Tracking').length + simpleDom.querySelectorAll('Creative Linear Tracking').length).to.equal(newXml.querySelectorAll('Creative Linear Tracking').length)
-    // console.log(xs.serializeToString(newXml))
   })
 })

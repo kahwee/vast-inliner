@@ -35,6 +35,7 @@
   },
   "standard": {
     "globals": [
+      "XMLSerializer",
       "DOMParser",
       "describe",
       "expect",
@@ -45,7 +46,7 @@
     ]
   },
   "scripts": {
-    "lint": "eslint test src",
+    "lint": "eslint tests src",
     "test": "karma start"
   },
   "repository": {
