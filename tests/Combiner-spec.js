@@ -21,7 +21,7 @@ describe('Combiner', function () {
     wrapperDom = dp.parseFromString(wrapperContent, 'application/xml')
   })
 
-  it('should have the correct tracking events', function () {
+  it('should have tracking events from both simple and its wrapper', function () {
     let c = new Combiner()
     c.add(wrapperDom)
     c.add(simpleDom)
