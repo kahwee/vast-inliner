@@ -15,6 +15,7 @@ module.exports = function (config) {
     browsers: browsers,
     preprocessors: preprocessors,
     files: [
+      'node_modules/babel-polyfill/dist/polyfill.min.js',
       'tests/**/*-spec.js',
       {
         // http://localhost:9876/base/tests/videos/apple-watch.mp4

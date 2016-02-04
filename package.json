@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "dependencies": {
+    "babel-polyfill": "^6.3.14",
     "dom2json": "^0.2.3",
     "lodash": "^4.2.0",
     "xhr": "^2.2.0"

@@ -1,4 +1,3 @@
-require('babel-register')
 import fetchXml from '../src/fetchXml'
 import { expect } from 'chai'
 const fs = require('fs')
