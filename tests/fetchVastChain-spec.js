@@ -1,3 +1,4 @@
+require('babel-register')
 import fetchVastChain from '../src/fetchVastChain'
 import { expect } from 'chai'
 const fs = require('fs')

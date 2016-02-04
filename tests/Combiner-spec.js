@@ -1,3 +1,4 @@
+require('babel-register')
 import Combiner from '../src/Combiner'
 import { expect } from 'chai'
 const fs = require('fs')

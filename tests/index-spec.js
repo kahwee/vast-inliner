@@ -1,3 +1,4 @@
+require('babel-register')
 import vastParser from '../src/index'
 import { expect } from 'chai'
 const fs = require('fs')
