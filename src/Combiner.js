@@ -1,13 +1,16 @@
 'use strict'
 
 export default function () {
-  let vastDocs = []
+  this.vastDocs = []
   return {
-    add: (dom) => {
-      vastDocs.unshift(dom)
+    unshift: (dom) => {
+      this.vastDocs.unshift(dom)
+    },
+    setVastDocs: vastDocs => {
+      this.vastDocs = vastDocs
     },
     execute: () => {
-      return vastDocs.reduce((previousValue, currentValue) => {
+      return this.vastDocs.reduce((previousValue, currentValue) => {
         // Carry over TrackingEvents
         let trackingEvents = previousValue.querySelector('InLine Creative Linear TrackingEvents');
         [...currentValue.querySelectorAll('Wrapper Creative Linear TrackingEvents Tracking')].forEach(node => {

@@ -49,7 +49,7 @@
     ]
   },
   "scripts": {
-    "test": "mocha --compilers js:babel-register tests"
+    "test": "karma start"
   },
   "repository": {
     "type": "git",

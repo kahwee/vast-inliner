@@ -2,7 +2,7 @@ import fetchXml from '../src/fetchXml'
 import { expect } from 'chai'
 const fs = require('fs')
 
-describe.only('fetchXml', function () {
+describe('fetchXml', function () {
 
   it('should parse into XML', function (done) {
     fetchXml('/base/tests/fixtures/simple.xml', function(err, resp, body) {
