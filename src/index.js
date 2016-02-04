@@ -2,7 +2,7 @@
 import Combiner from './Combiner'
 import fetchVastChain from './fetchVastChain'
 
-export default function (uri, serialize=true) {
+export default function (uri, serialize = true) {
   const xmlSerializer = new XMLSerializer()
   return new Promise((resolve, reject) => {
     fetchVastChain(uri).then(data => {

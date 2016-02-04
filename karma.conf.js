@@ -45,8 +45,7 @@ module.exports = function (config) {
               '**/*.html',
               '**/*.xml',
               '**/*.css',
-              '**/*.swf',
-              '**/*.js'
+              '**/*.swf'
             ],
             instrumenter: istanbul,
             instrumenterConfig: {

@@ -50,6 +50,7 @@
     ]
   },
   "scripts": {
+    "lint": "eslint test src",
     "test": "karma start"
   },
   "repository": {
