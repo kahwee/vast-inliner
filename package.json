@@ -1,8 +1,8 @@
 {
   "name": "vast-inliner",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "xhr": "^2.2.0"
   },
@@ -46,6 +46,7 @@
     ]
   },
   "scripts": {
+    "babel": "./node_modules/.bin/babel -d lib src",
     "lint": "eslint tests src",
     "test": "karma start"
   },
