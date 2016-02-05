@@ -6,13 +6,20 @@ import fetchXml from './fetchXml'
  * @param  {[type]} initialUri [description]
  * @return {Promise}            [description]
  */
-export default function fetchVastChain (initialUri) {
+/**
+ * Resolves with a array of this:
+ * @param  {[type]} initialUri [description]
+ * @param  {[type]} options    Valid options and `timeout` and `withCredentials`
+ * @return {[type]}            [description]
+ */
+export default function fetchVastChain (initialUri, options = {}) {
   return new Promise((resolve, reject) => {
     let vastChain = []
     fetchChainItem(initialUri)
-    function fetchChainItem (uri) {
-      fetchXml(uri, function (err, resp, body) {
+    function fetchChainItem (uri, options) {
+      fetchXml(uri, options, function (err, resp, body) {
         if (err) {
+          console.log(err)
           reject(err)
         }
         let output = {
@@ -21,7 +28,7 @@ export default function fetchVastChain (initialUri) {
         let vastAdTagURI = body.querySelector('Wrapper VASTAdTagURI')
         if (vastAdTagURI) {
           output.VASTAdTagURI = vastAdTagURI.textContent
-          fetchChainItem(output.VASTAdTagURI)
+          fetchChainItem(output.VASTAdTagURI, options)
         }
         vastChain.unshift(output)
         if (!vastAdTagURI) {

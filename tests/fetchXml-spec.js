@@ -3,7 +3,7 @@ import { expect } from 'chai'
 
 describe('fetchXml', function () {
   it('should parse into XML', function (done) {
-    fetchXml('/base/tests/fixtures/simple.xml', function (err, resp, body) {
+    fetchXml('/base/tests/fixtures/simple.xml', {}, function (err, resp, body) {
       if (err) {
         throw err
       }
@@ -13,7 +13,7 @@ describe('fetchXml', function () {
   })
 
   it('should download correctly', function (done) {
-    fetchXml('/base/tests/fixtures/simple.xml', function (err, resp, body) {
+    fetchXml('/base/tests/fixtures/simple.xml', {}, function (err, resp, body) {
       if (err) {
         throw err
       }

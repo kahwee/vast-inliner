@@ -1,3 +1,7 @@
+# v1.0.3 -- 2016-02-05
+
+* Added valid options and `timeout` and `withCredentials`
+
 # v1.0.2 -- 2016-02-04
 
 * Messed up publishing.
