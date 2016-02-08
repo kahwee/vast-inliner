@@ -1,3 +1,7 @@
+# v1.0.4 -- 2016-02-08
+
+* Remove header specification
+
 # v1.0.3 -- 2016-02-05
 
 * Added valid options and `timeout` and `withCredentials`

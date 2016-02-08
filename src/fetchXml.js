@@ -6,12 +6,7 @@ export default function fetchXml (uri, options = {}, cb) {
   let opts = {
     uri: uri,
     responseType: 'document',
-    headers: {
-      'Content-Type': 'application/xml'
-    }
-  }
-  if (options.withCredentials) {
-    opts.withCredentials = options.withCredentials
+    withCredentials: !!options.withCredentials
   }
   if (options.timeout) {
     opts.timeout = options.timeout
