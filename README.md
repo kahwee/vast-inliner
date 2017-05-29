@@ -8,6 +8,8 @@ vast-inliner is written as a challenge. The aim of this is to turn VAST document
 
 # Installing
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kahwee/vast-inliner.svg)](https://greenkeeper.io/)
+
 ```sh
 npm i vast-inline --save
 ```
