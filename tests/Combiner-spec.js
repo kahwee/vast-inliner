@@ -1,14 +1,9 @@
 import Combiner from '../src/Combiner'
 import { expect } from 'chai'
-const fs = require('fs')
+import simpleContent from './fixtures/simple.xml'
+import wrapperContent from './fixtures/wrapper-1.xml'
 
 describe('Combiner', function () {
-  const simpleContent = fs.readFileSync(`${__dirname}/fixtures/simple.xml`, {
-    encoding: 'utf8'
-  })
-  const wrapperContent = fs.readFileSync(`${__dirname}/fixtures/wrapper-1.xml`, {
-    encoding: 'utf8'
-  })
   let dp
   let simpleDom
   let wrapperDom

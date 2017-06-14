@@ -1,3 +1,7 @@
+# v1.1.0 -- 2017-06-13
+
+* Use webpack instead of browserify
+
 # v1.0.4 -- 2016-02-08
 
 * Remove header specification

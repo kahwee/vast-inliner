@@ -7,7 +7,6 @@ describe('fetchXml', function () {
       if (err) {
         throw err
       }
-      expect(body.querySelector).to.be.defined
       done()
     })
   })
