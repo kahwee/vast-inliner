@@ -24,7 +24,6 @@
     "html-loader": "^0.4.5",
     "istanbul": "^0.4.5",
     "karma": "^1.7.0",
-    "karma-babel-preprocessor": "^6.0.1",
     "karma-chrome-launcher": "^2.1.1",
     "karma-chai": "^0.1.0",
     "karma-cli": "^1.0.1",
@@ -49,12 +48,8 @@
     "globals": [
       "XMLSerializer",
       "DOMParser",
-      "describe",
       "expect",
-      "before",
-      "after",
-      "$",
-      "it"
+      "$"
     ]
   },
   "repository": {
