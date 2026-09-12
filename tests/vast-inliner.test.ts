@@ -97,6 +97,36 @@ describe("fetchVastChain", () => {
     }) as unknown as typeof globalThis.fetch;
     await expect(fetchVastChain("https://ads.test/start.xml", { fetch })).rejects.toThrow("cycle");
   });
+
+  it("honors followAdditionalWrappers=false", async () => {
+    const restrictive = wrapper("next.xml").replace(
+      "<Wrapper>",
+      '<Wrapper followAdditionalWrappers="false">',
+    );
+    const fetch = mockFetch({
+      "https://ads.test/root.xml": restrictive,
+      "https://ads.test/next.xml": wrapper("inline.xml"),
+    });
+    await expect(fetchVastChain("https://ads.test/root.xml", { fetch })).rejects.toThrow(
+      "disallowed",
+    );
+  });
+
+  it("rejects XML that is not VAST", async () => {
+    const fetch = mockFetch({ "https://ads.test/not-vast.xml": "<response/>" });
+    await expect(fetchVastChain("https://ads.test/not-vast.xml", { fetch })).rejects.toThrow(
+      "Expected a VAST document",
+    );
+  });
+
+  it("rejects wrappers without a destination", async () => {
+    const fetch = mockFetch({
+      "https://ads.test/broken-wrapper.xml": "<VAST><Ad><Wrapper/></Ad></VAST>",
+    });
+    await expect(fetchVastChain("https://ads.test/broken-wrapper.xml", { fetch })).rejects.toThrow(
+      "missing VASTAdTagURI",
+    );
+  });
 });
 
 describe("Combiner", () => {
@@ -119,6 +149,36 @@ describe("Combiner", () => {
 
   it("requires an inline ad", () => {
     expect(() => new Combiner([parseXml(wrapper("next.xml"))]).execute()).toThrow("InLine");
+  });
+
+  it("merges VAST 4 wrapper measurement and click-tracking surfaces", () => {
+    const modernInline = parseXml(`<VAST version="4.3"><Ad><InLine><Creatives>
+      <Creative><Linear><Duration>00:00:10</Duration><MediaFiles/><Icons><Icon program="adChoices"><IconClicks><IconClickThrough>inline-icon</IconClickThrough></IconClicks></Icon></Icons></Linear></Creative>
+      <Creative><NonLinearAds><NonLinear><NonLinearClickThrough>inline-nonlinear</NonLinearClickThrough></NonLinear></NonLinearAds></Creative>
+      <Creative><CompanionAds><Companion id="companion"><CompanionClickThrough>inline-companion</CompanionClickThrough></Companion></CompanionAds></Creative>
+    </Creatives></InLine></Ad></VAST>`);
+    const modernWrapper = parseXml(`<VAST version="4.3"><Ad><Wrapper>
+      <VASTAdTagURI>next.xml</VASTAdTagURI>
+      <ViewableImpression><Viewable>viewable</Viewable><NotViewable>not-viewable</NotViewable></ViewableImpression>
+      <AdVerifications><Verification vendor="example"><JavaScriptResource>verify.js</JavaScriptResource></Verification></AdVerifications>
+      <Extensions><Extension type="example">metadata</Extension></Extensions>
+      <Creatives>
+        <Creative><Linear><TrackingEvents><Tracking event="start">start</Tracking></TrackingEvents><VideoClicks><ClickThrough>must-not-replace-inline</ClickThrough><ClickTracking>click</ClickTracking><CustomClick>custom</CustomClick></VideoClicks><Icons><Icon program="adChoices"><IconClicks><IconClickTracking>icon-click</IconClickTracking></IconClicks></Icon></Icons></Linear></Creative>
+        <Creative><NonLinearAds><NonLinear><NonLinearClickTracking>nonlinear-click</NonLinearClickTracking></NonLinear></NonLinearAds></Creative>
+        <Creative><CompanionAds><Companion id="companion"><CompanionClickTracking>companion-click</CompanionClickTracking></Companion></CompanionAds></Creative>
+      </Creatives>
+    </Wrapper></Ad></VAST>`);
+
+    const output = new Combiner([modernInline, modernWrapper]).execute();
+    expect(output.getElementsByTagName("Verification").length).toBe(1);
+    expect(output.getElementsByTagName("Viewable").length).toBe(1);
+    expect(output.getElementsByTagName("Extension").length).toBe(1);
+    expect(output.getElementsByTagName("ClickTracking").length).toBe(1);
+    expect(output.getElementsByTagName("CustomClick").length).toBe(1);
+    expect(output.getElementsByTagName("ClickThrough").length).toBe(0);
+    expect(output.getElementsByTagName("IconClickTracking").length).toBe(1);
+    expect(output.getElementsByTagName("NonLinearClickTracking").length).toBe(1);
+    expect(output.getElementsByTagName("CompanionClickTracking").length).toBe(1);
   });
 });
 

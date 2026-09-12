@@ -3,6 +3,8 @@
 * Replace the legacy Babel, Webpack, Karma, and Travis toolchain with TypeScript, tsdown, Vitest, Biome, and GitHub Actions.
 * Use standards-based `fetch` with timeout, cancellation, relative URL, HTTP error, cycle, and wrapper-depth handling.
 * Publish ESM, CommonJS, and TypeScript declaration entry points.
+* Support VAST 4 wrapper viewability, verification, extension, linear, icon, nonlinear, and companion tracking inheritance.
+* Enforce wrapper controls, VAST roots, response-size limits, and schema-aware merge placement.
 
 # v1.1.0 -- 2017-06-13
 

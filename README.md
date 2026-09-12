@@ -43,6 +43,11 @@ const xml = await vastInliner("https://ads.example/vast.xml", {
 
 Relative `VASTAdTagURI` values resolve against the response URL. Cycles, malformed XML, HTTP errors, timeouts, and excessive wrapper depth reject with an error.
 
+Wrapper inheritance covers impressions, errors, linear tracking, click tracking, custom clicks,
+icon click tracking, nonlinear click tracking, companion click tracking, viewable-impression URIs,
+ad verifications, and extensions. Inline click-through destinations and media resources are never
+replaced. The `followAdditionalWrappers` control is enforced.
+
 ## Development
 
 ```sh

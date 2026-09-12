@@ -29,6 +29,138 @@ function copyBefore(target: Element, nodes: Element[], reference: Element | unde
   }
 }
 
+function ensureChild(parent: Element, tagName: string, before?: Element): Element {
+  const existing = children(parent, tagName)[0];
+  if (existing) return existing;
+  const ownerDocument = parent.ownerDocument;
+  if (!ownerDocument) throw new Error("Cannot modify a detached XML element");
+  const element = ownerDocument.createElement(tagName);
+  parent.insertBefore(element, before ?? null);
+  return element;
+}
+
+function mergeContainer(
+  targetParent: Element,
+  sourceParent: Element,
+  containerName: string,
+  childNames: string[],
+  before?: Element,
+): void {
+  const sources = children(sourceParent, containerName);
+  if (sources.length === 0) return;
+  const target = ensureChild(targetParent, containerName, before);
+  for (const source of sources) {
+    copyBefore(
+      target,
+      childNames.flatMap((name) => children(source, name)),
+      undefined,
+    );
+  }
+}
+
+function mergeLinearCreative(inline: Element, wrapper: Element): void {
+  const targetLinear = descendantsAtPath(inline, ["Creatives", "Creative", "Linear"])[0];
+  if (!targetLinear) return;
+  const sourceLinears = descendantsAtPath(wrapper, ["Creatives", "Creative", "Linear"]);
+  for (const sourceLinear of sourceLinears) {
+    mergeContainer(
+      targetLinear,
+      sourceLinear,
+      "TrackingEvents",
+      ["Tracking"],
+      children(targetLinear, "VideoClicks")[0] ?? children(targetLinear, "Icons")[0],
+    );
+    mergeContainer(
+      targetLinear,
+      sourceLinear,
+      "VideoClicks",
+      ["ClickTracking", "CustomClick"],
+      children(targetLinear, "Icons")[0],
+    );
+  }
+}
+
+function mergeCreativeTracking(inline: Element, wrapper: Element): void {
+  const targetIcons = descendantsAtPath(inline, [
+    "Creatives",
+    "Creative",
+    "Linear",
+    "Icons",
+    "Icon",
+  ]);
+  const sourceIcons = descendantsAtPath(wrapper, [
+    "Creatives",
+    "Creative",
+    "Linear",
+    "Icons",
+    "Icon",
+  ]);
+  sourceIcons.forEach((source, index) => {
+    const program = source.getAttribute("program");
+    const target =
+      (program
+        ? targetIcons.find((icon) => icon.getAttribute("program") === program)
+        : undefined) ??
+      targetIcons[index] ??
+      targetIcons[0];
+    if (target) {
+      const sourceClicks = children(source, "IconClicks")[0];
+      if (sourceClicks) {
+        mergeContainer(target, source, "IconClicks", ["IconClickTracking"]);
+      }
+    }
+  });
+
+  const targetNonLinear = descendantsAtPath(inline, [
+    "Creatives",
+    "Creative",
+    "NonLinearAds",
+    "NonLinear",
+  ])[0];
+  if (targetNonLinear) {
+    copyBefore(
+      targetNonLinear,
+      descendantsAtPath(wrapper, [
+        "Creatives",
+        "Creative",
+        "NonLinearAds",
+        "NonLinear",
+        "NonLinearClickTracking",
+      ]),
+      children(targetNonLinear, "NonLinearClickThrough")[0],
+    );
+  }
+
+  const targetCompanions = descendantsAtPath(inline, [
+    "Creatives",
+    "Creative",
+    "CompanionAds",
+    "Companion",
+  ]);
+  const sourceCompanions = descendantsAtPath(wrapper, [
+    "Creatives",
+    "Creative",
+    "CompanionAds",
+    "Companion",
+  ]);
+  sourceCompanions.forEach((source, index) => {
+    const id = source.getAttribute("id");
+    const target =
+      (id
+        ? targetCompanions.find((companion) => companion.getAttribute("id") === id)
+        : undefined) ??
+      targetCompanions[index] ??
+      targetCompanions[0];
+    if (target) {
+      copyBefore(
+        target,
+        children(source, "CompanionClickTracking"),
+        children(target, "TrackingEvents")[0],
+      );
+    }
+  });
+}
+
 export class Combiner {
   #vastDocuments: XmlDocument[] = [];
 
@@ -57,28 +189,20 @@ export class Combiner {
     for (const wrapper of wrappers) {
       const wrapperElement = first(wrapper, "Wrapper");
       if (!wrapperElement) throw new Error("A non-final VAST document must contain a Wrapper");
-      const trackingEvents = descendantsAtPath(inline, [
-        "Creatives",
-        "Creative",
-        "Linear",
-        "TrackingEvents",
-      ])[0];
-      if (trackingEvents) {
-        copyBefore(
-          trackingEvents,
-          descendantsAtPath(wrapperElement, [
-            "Creatives",
-            "Creative",
-            "Linear",
-            "TrackingEvents",
-            "Tracking",
-          ]),
-          undefined,
-        );
-      }
       const creatives = children(inline, "Creatives")[0];
       copyBefore(inline, children(wrapperElement, "Error"), creatives);
       copyBefore(inline, children(wrapperElement, "Impression"), creatives);
+      mergeContainer(
+        inline,
+        wrapperElement,
+        "ViewableImpression",
+        ["Viewable", "NotViewable", "ViewUndetermined"],
+        creatives,
+      );
+      mergeContainer(inline, wrapperElement, "AdVerifications", ["Verification"], creatives);
+      mergeContainer(inline, wrapperElement, "Extensions", ["Extension"], creatives);
+      mergeLinearCreative(inline, wrapperElement);
+      mergeCreativeTracking(inline, wrapperElement);
     }
 
     return output;
