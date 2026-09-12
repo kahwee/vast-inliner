@@ -3,9 +3,11 @@ import { fetchVastChain, type FetchVastChainOptions } from "./fetch-vast-chain";
 import { serializeXml, type XmlDocument } from "./xml";
 
 export interface VastInlinerOptions extends FetchVastChainOptions {
+  /** Return serialized XML instead of an xmldom `Document`. */
   serialize?: boolean;
 }
 
+/** Resolve a remote wrapper chain into one inline VAST document. */
 export async function vastInliner(
   uri: string,
   options: VastInlinerOptions & { serialize: true },

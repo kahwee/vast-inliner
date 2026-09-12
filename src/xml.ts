@@ -2,6 +2,7 @@ import { DOMParser, type Document, XMLSerializer } from "@xmldom/xmldom";
 
 export type XmlDocument = Document;
 
+/** Parse XML and normalize parser-specific failures into a single `SyntaxError` contract. */
 export function parseXml(xml: string): XmlDocument {
   const errors: string[] = [];
   let document: XmlDocument;
@@ -23,6 +24,7 @@ export function parseXml(xml: string): XmlDocument {
   return document;
 }
 
+/** Serialize an XML document without altering its node tree. */
 export function serializeXml(document: XmlDocument): string {
   return new XMLSerializer().serializeToString(document);
 }

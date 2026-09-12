@@ -1,3 +1,9 @@
+# v2.0.1 -- 2026-09-12
+
+* Expand the maintainer story and package metadata with KahWee Teng's DSP and SSP background.
+* Document public APIs and the non-obvious invariants behind safe wrapper traversal and merging.
+* Move the repository's default branch and CI target from `master` to `main`.
+
 # v2.0.0 -- 2026-09-12
 
 * Replace the legacy Babel, Webpack, Karma, and Travis toolchain with TypeScript, tsdown, Vitest, Biome, and GitHub Actions.

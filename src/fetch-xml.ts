@@ -1,11 +1,17 @@
 import { parseXml, type XmlDocument } from "./xml";
 
 export interface FetchXmlOptions {
+  /** Fetch implementation to use. Injection keeps tests and non-browser runtimes deterministic. */
   fetch?: typeof globalThis.fetch;
+  /** Headers forwarded to every request in the wrapper chain. */
   headers?: HeadersInit;
+  /** Maximum UTF-8 response size. Defaults to 5 MB. */
   maxResponseBytes?: number;
+  /** Caller-controlled cancellation signal. */
   signal?: AbortSignal;
+  /** Per-request timeout in milliseconds. */
   timeout?: number;
+  /** Include cross-origin credentials in browser requests. */
   withCredentials?: boolean;
 }
 
@@ -16,6 +22,7 @@ export interface XmlResponse {
   url: string;
 }
 
+/** Fetch and parse one XML document with bounded size, cancellation, and HTTP validation. */
 export async function fetchXml(uri: string, options: FetchXmlOptions = {}): Promise<XmlResponse> {
   const fetcher = options.fetch ?? globalThis.fetch;
   if (!fetcher) throw new Error("No fetch implementation is available");
@@ -44,6 +51,8 @@ export async function fetchXml(uri: string, options: FetchXmlOptions = {}): Prom
   if (!response.ok) {
     throw new Error(`VAST request failed with HTTP ${response.status} for ${response.url || uri}`);
   }
+  // Content-Length allows an early rejection; the encoded-size check below remains authoritative
+  // because servers can omit or misreport the header.
   const declaredLength = Number(response.headers.get("content-length"));
   if (Number.isFinite(declaredLength) && declaredLength > maxResponseBytes) {
     throw new Error(`VAST response exceeds maxResponseBytes (${maxResponseBytes})`);

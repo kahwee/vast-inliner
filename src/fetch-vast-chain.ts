@@ -1,6 +1,7 @@
 import { fetchXml, type FetchXmlOptions, type XmlResponse } from "./fetch-xml";
 
 export interface FetchVastChainOptions extends FetchXmlOptions {
+  /** Maximum wrappers to traverse before the final inline response. Defaults to 10. */
   maxDepth?: number;
 }
 
@@ -27,6 +28,12 @@ function wrapperDetails(document: XmlResponse["document"]):
   };
 }
 
+/**
+ * Fetch a VAST wrapper chain and return it inline-first.
+ *
+ * Inline-first order is intentional: `Combiner` starts with the final playable document and then
+ * accumulates metadata from each wrapper without ever promoting wrapper media into the result.
+ */
 export async function fetchVastChain(
   initialUri: string,
   options: FetchVastChainOptions = {},
@@ -49,6 +56,8 @@ export async function fetchVastChain(
     if (response.document.documentElement?.nodeName !== "VAST") {
       throw new Error(`Expected a VAST document from ${response.url}`);
     }
+    // Track both requested and post-redirect URLs. Otherwise two aliases that redirect to the same
+    // endpoint can evade cycle detection indefinitely.
     if (response.url !== uri) {
       if (visited.has(response.url)) {
         throw new Error(`VAST wrapper cycle detected after redirect to ${response.url}`);

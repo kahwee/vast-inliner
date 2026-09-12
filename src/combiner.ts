@@ -59,6 +59,8 @@ function mergeContainer(
 }
 
 function mergeLinearCreative(inline: Element, wrapper: Element): void {
+  // A wrapper describes tracking around the downstream linear experience; it never supplies a
+  // replacement MediaFile or ClickThrough. Those playable resources stay owned by the inline ad.
   const targetLinear = descendantsAtPath(inline, ["Creatives", "Creative", "Linear"])[0];
   if (!targetLinear) return;
   const sourceLinears = descendantsAtPath(wrapper, ["Creatives", "Creative", "Linear"]);
@@ -81,6 +83,8 @@ function mergeLinearCreative(inline: Element, wrapper: Element): void {
 }
 
 function mergeCreativeTracking(inline: Element, wrapper: Element): void {
+  // Match vendor-addressable creatives first, then use document order as the deterministic
+  // fallback recommended for legacy documents that omit identifiers.
   const targetIcons = descendantsAtPath(inline, [
     "Creatives",
     "Creative",
@@ -175,14 +179,20 @@ export class Combiner {
     this.#vastDocuments = documents;
   }
 
+  /** Prepend a document while assembling an inline-first chain manually. */
   unshift(document: XmlDocument): void {
     this.#vastDocuments.unshift(document);
   }
 
+  /** Replace the complete inline-first chain used by the next `execute` call. */
   setVastDocs(documents: XmlDocument[]): void {
     this.#vastDocuments = documents;
   }
 
+  /**
+   * Create a new inline VAST document containing applicable metadata from every wrapper.
+   * Source documents are never mutated, which makes retries and independent policy evaluation safe.
+   */
   execute(): XmlDocument {
     const [inlineDocument, ...wrappers] = this.#vastDocuments;
     if (!inlineDocument || !first(inlineDocument, "InLine")) {

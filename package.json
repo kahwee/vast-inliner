@@ -1,6 +1,6 @@
 {
   "name": "vast-inliner",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Resolve VAST wrapper chains into a single inline VAST document",
   "type": "module",
   "sideEffects": false,
