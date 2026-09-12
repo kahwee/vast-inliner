@@ -1,0 +1,8 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.13/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "files": { "includes": ["**", "!!dist", "!!coverage", "!!node_modules"] },
+  "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 100 },
+  "javascript": { "formatter": { "quoteStyle": "double", "semicolons": "always" } },
+  "linter": { "enabled": true, "rules": { "preset": "recommended" } }
+}

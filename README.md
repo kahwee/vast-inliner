@@ -1,31 +1,52 @@
-vast-inliner is written as a challenge. The aim of this is to turn VAST documents with wrappers into a single VAST document that is InLine.
+# vast-inliner
 
-[![Build Status](https://travis-ci.org/kahwee/vast-inliner.svg?branch=master)](https://travis-ci.org/kahwee/vast-inliner)
-[![Coverage Status](https://coveralls.io/repos/github/kahwee/vast-inliner/badge.svg?branch=master)](https://coveralls.io/github/kahwee/vast-inliner?branch=master)
-[![npm version](https://badge.fury.io/js/vast-inliner.svg)](https://badge.fury.io/js/vast-inliner)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
-[![Greenkeeper badge](https://badges.greenkeeper.io/kahwee/vast-inliner.svg)](https://greenkeeper.io/)
-[![bitHound Score](https://www.bithound.io/github/kahwee/vast-inliner/badges/score.svg)](https://www.bithound.io/github/kahwee/vast-inliner)
+[![CI](https://github.com/kahwee/vast-inliner/actions/workflows/ci.yml/badge.svg)](https://github.com/kahwee/vast-inliner/actions/workflows/ci.yml)
 
-# Installing
+Resolve a chain of VAST wrappers into one inline VAST document. Wrapper impressions, errors, and linear tracking events are copied into the final inline ad.
 
+## Install
 
 ```sh
-npm i vast-inline --save
+bun add vast-inliner
 ```
 
-# Using
+Node.js 22 or newer is supported. The package includes ESM, CommonJS, and TypeScript declarations.
 
-Using it in code
+## Use
 
-```js
-const vastInliner = require('vast-inliner')
+```ts
+import vastInliner from "vast-inliner";
+
+const document = await vastInliner("https://ads.example/vast.xml", {
+  timeout: 5_000,
+  maxDepth: 8,
+});
 ```
 
-or if ES2015 is your thing:
+Request serialized XML when a DOM document is not convenient:
 
-```js
-import vastInliner from 'vast-inliner'
+```ts
+const xml = await vastInliner("https://ads.example/vast.xml", {
+  serialize: true,
+});
 ```
 
-# Recommendations
+## Options
+
+- `serialize`: return XML text instead of a `Document`.
+- `timeout`: abort each request after this many milliseconds.
+- `maxDepth`: maximum number of wrappers to follow; defaults to 10.
+- `withCredentials`: send cross-origin credentials in browsers.
+- `headers`, `signal`: standard Fetch API request controls.
+- `fetch`: inject a Fetch-compatible implementation for tests or custom runtimes.
+
+Relative `VASTAdTagURI` values resolve against the response URL. Cycles, malformed XML, HTTP errors, timeouts, and excessive wrapper depth reject with an error.
+
+## Development
+
+```sh
+bun install
+bun run check
+```
+
+The complete check formats and lints with Biome, type-checks, runs tests with coverage, builds both package formats, and audits dependencies.
