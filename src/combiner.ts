@@ -21,11 +21,11 @@ function descendantsAtPath(root: Element, path: string[]): Element[] {
   );
 }
 
-function appendAll(target: Element, nodes: Element[]): void {
+function copyBefore(target: Element, nodes: Element[], reference: Element | undefined): void {
   const ownerDocument = target.ownerDocument;
   if (!ownerDocument) throw new Error("Cannot merge into a detached XML element");
   for (const node of nodes) {
-    target.appendChild(ownerDocument.importNode(node, true));
+    target.insertBefore(ownerDocument.importNode(node, true), reference ?? null);
   }
 }
 
@@ -57,9 +57,14 @@ export class Combiner {
     for (const wrapper of wrappers) {
       const wrapperElement = first(wrapper, "Wrapper");
       if (!wrapperElement) throw new Error("A non-final VAST document must contain a Wrapper");
-      const trackingEvents = first(output, "TrackingEvents");
+      const trackingEvents = descendantsAtPath(inline, [
+        "Creatives",
+        "Creative",
+        "Linear",
+        "TrackingEvents",
+      ])[0];
       if (trackingEvents) {
-        appendAll(
+        copyBefore(
           trackingEvents,
           descendantsAtPath(wrapperElement, [
             "Creatives",
@@ -68,10 +73,12 @@ export class Combiner {
             "TrackingEvents",
             "Tracking",
           ]),
+          undefined,
         );
       }
-      appendAll(inline, children(wrapperElement, "Impression"));
-      appendAll(inline, children(wrapperElement, "Error"));
+      const creatives = children(inline, "Creatives")[0];
+      copyBefore(inline, children(wrapperElement, "Error"), creatives);
+      copyBefore(inline, children(wrapperElement, "Impression"), creatives);
     }
 
     return output;

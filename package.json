@@ -1,6 +1,6 @@
 {
   "name": "vast-inliner",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Resolve VAST wrapper chains into a single inline VAST document",
   "type": "module",
   "sideEffects": false,
@@ -27,10 +27,11 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build && bun audit",
+    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build && bun run package:check && bun audit",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "lint": "biome lint .",
+    "package:check": "publint && attw --pack .",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
@@ -42,6 +43,8 @@
     "@biomejs/biome": "2.5.13",
     "@types/node": "22.20.2",
     "@vitest/coverage-v8": "5.0.0",
+    "@arethetypeswrong/cli": "0.18.5",
+    "publint": "0.3.24",
     "tsdown": "0.23.0",
     "typescript": "7.0.2",
     "vitest": "5.0.0"

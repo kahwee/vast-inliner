@@ -9,7 +9,11 @@ export interface VastChainItem extends XmlResponse {
 }
 
 function wrapperUri(document: XmlResponse["document"]): string | undefined {
-  const node = document.getElementsByTagName("VASTAdTagURI").item(0);
+  const wrapper = document.getElementsByTagName("Wrapper").item(0);
+  if (!wrapper) return undefined;
+  const node = Array.from({ length: wrapper.childNodes.length }, (_, index) =>
+    wrapper.childNodes.item(index),
+  ).find((child) => child?.nodeType === 1 && child.nodeName === "VASTAdTagURI");
   const value = node?.textContent?.trim();
   return value || undefined;
 }
@@ -32,6 +36,12 @@ export async function fetchVastChain(
     visited.add(uri);
 
     const response = await fetchXml(uri, options);
+    if (response.url !== uri) {
+      if (visited.has(response.url)) {
+        throw new Error(`VAST wrapper cycle detected after redirect to ${response.url}`);
+      }
+      visited.add(response.url);
+    }
     const vastAdTagUri = wrapperUri(response.document);
     chain.unshift({ ...response, ...(vastAdTagUri ? { vastAdTagUri } : {}) });
     if (!vastAdTagUri) return chain;

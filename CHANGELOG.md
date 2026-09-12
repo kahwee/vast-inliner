@@ -1,4 +1,4 @@
-# Unreleased
+# v2.0.0 -- 2026-09-12
 
 * Replace the legacy Babel, Webpack, Karma, and Travis toolchain with TypeScript, tsdown, Vitest, Biome, and GitHub Actions.
 * Use standards-based `fetch` with timeout, cancellation, relative URL, HTTP error, cycle, and wrapper-depth handling.

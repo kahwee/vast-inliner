@@ -10,7 +10,14 @@ export async function vastInliner(
   uri: string,
   options: VastInlinerOptions & { serialize: true },
 ): Promise<string>;
-export async function vastInliner(uri: string, options?: VastInlinerOptions): Promise<XmlDocument>;
+export async function vastInliner(
+  uri: string,
+  options?: VastInlinerOptions & { serialize?: false },
+): Promise<XmlDocument>;
+export async function vastInliner(
+  uri: string,
+  options: VastInlinerOptions,
+): Promise<XmlDocument | string>;
 export async function vastInliner(
   uri: string,
   options: VastInlinerOptions = {},

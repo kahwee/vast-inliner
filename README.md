@@ -36,6 +36,7 @@ const xml = await vastInliner("https://ads.example/vast.xml", {
 - `serialize`: return XML text instead of a `Document`.
 - `timeout`: abort each request after this many milliseconds.
 - `maxDepth`: maximum number of wrappers to follow; defaults to 10.
+- `maxResponseBytes`: maximum decoded response size; defaults to 5 MB.
 - `withCredentials`: send cross-origin credentials in browsers.
 - `headers`, `signal`: standard Fetch API request controls.
 - `fetch`: inject a Fetch-compatible implementation for tests or custom runtimes.

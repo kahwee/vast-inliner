@@ -34,6 +34,15 @@ describe("fetchXml", () => {
       }),
     ).rejects.toThrow("Invalid XML");
   });
+
+  it("rejects oversized responses", async () => {
+    await expect(
+      fetchXml("https://ads.test/large.xml", {
+        fetch: mockFetch({ "https://ads.test/large.xml": inline }),
+        maxResponseBytes: 10,
+      }),
+    ).rejects.toThrow("maxResponseBytes");
+  });
 });
 
 describe("fetchVastChain", () => {
@@ -64,6 +73,30 @@ describe("fetchVastChain", () => {
       fetchVastChain("https://ads.test/a.xml", { fetch: deep, maxDepth: 0 }),
     ).rejects.toThrow("maxDepth");
   });
+
+  it("ignores VASTAdTagURI outside a Wrapper", async () => {
+    const inlineWithExtension = inline.replace(
+      "</InLine>",
+      "<Extensions><VASTAdTagURI>trap.xml</VASTAdTagURI></Extensions></InLine>",
+    );
+    const fetch = mockFetch({ "https://ads.test/inline.xml": inlineWithExtension });
+    await expect(fetchVastChain("https://ads.test/inline.xml", { fetch })).resolves.toHaveLength(1);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("detects cycles hidden by redirects", async () => {
+    const fetch = vi.fn(async (input: string | URL | Request) => {
+      const requested = String(input);
+      const response = new Response(wrapper("https://ads.test/canonical.xml"));
+      Object.defineProperty(response, "url", {
+        value: requested.endsWith("start.xml")
+          ? "https://ads.test/canonical.xml"
+          : "https://ads.test/other.xml",
+      });
+      return response;
+    }) as unknown as typeof globalThis.fetch;
+    await expect(fetchVastChain("https://ads.test/start.xml", { fetch })).rejects.toThrow("cycle");
+  });
 });
 
 describe("Combiner", () => {
@@ -75,6 +108,13 @@ describe("Combiner", () => {
     expect(output.getElementsByTagName("Impression").length).toBe(2);
     expect(output.getElementsByTagName("Error").length).toBe(1);
     expect(source.getElementsByTagName("Tracking").length).toBe(1);
+    const inlineChildren = Array.from(
+      { length: output.getElementsByTagName("InLine").item(0)?.childNodes.length ?? 0 },
+      (_, index) => output.getElementsByTagName("InLine").item(0)?.childNodes.item(index)?.nodeName,
+    );
+    expect(inlineChildren.lastIndexOf("Impression")).toBeLessThan(
+      inlineChildren.indexOf("Creatives"),
+    );
   });
 
   it("requires an inline ad", () => {
