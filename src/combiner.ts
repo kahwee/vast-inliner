@@ -111,25 +111,32 @@ function mergeCreativeTracking(inline: Element, wrapper: Element): void {
     }
   });
 
-  const targetNonLinear = descendantsAtPath(inline, [
+  const targetNonLinears = descendantsAtPath(inline, [
     "Creatives",
     "Creative",
     "NonLinearAds",
     "NonLinear",
-  ])[0];
-  if (targetNonLinear) {
-    copyBefore(
-      targetNonLinear,
-      descendantsAtPath(wrapper, [
-        "Creatives",
-        "Creative",
-        "NonLinearAds",
-        "NonLinear",
-        "NonLinearClickTracking",
-      ]),
-      children(targetNonLinear, "NonLinearClickThrough")[0],
-    );
-  }
+  ]);
+  const sourceNonLinears = descendantsAtPath(wrapper, [
+    "Creatives",
+    "Creative",
+    "NonLinearAds",
+    "NonLinear",
+  ]);
+  sourceNonLinears.forEach((source, index) => {
+    const id = source.getAttribute("id");
+    const target =
+      (id ? targetNonLinears.find((creative) => creative.getAttribute("id") === id) : undefined) ??
+      targetNonLinears[index] ??
+      targetNonLinears[0];
+    if (target) {
+      copyBefore(
+        target,
+        children(source, "NonLinearClickTracking"),
+        children(target, "NonLinearClickThrough")[0],
+      );
+    }
+  });
 
   const targetCompanions = descendantsAtPath(inline, [
     "Creatives",

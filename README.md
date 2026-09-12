@@ -4,6 +4,66 @@
 
 Resolve a chain of VAST wrappers into one inline VAST document. Wrapper impressions, errors, and linear tracking events are copied into the final inline ad.
 
+## VAST today
+
+VAST—the Video Ad Serving Template—is an XML contract between an ad server and a video or
+audio player. It describes the creative, media candidates, tracking endpoints, click behavior,
+verification resources, and wrapper redirects. It does not play the ad or define the player API.
+
+As of September 2026, [VAST 4.3](https://github.com/InteractiveAdvertisingBureau/VAST4.x/blob/main/4.3.md)
+is the latest published IAB Tech Lab specification (December 2022). The repository also contains
+a [VAST 4.4 draft](https://github.com/InteractiveAdvertisingBureau/VAST4.x/blob/main/4.4.md),
+but that document still lists its publication date as TBD. Treat 4.4 features as draft until IAB
+Tech Lab publishes them.
+
+What matters most in a current implementation:
+
+- **Wrappers are cumulative.** A player must preserve applicable tracking, errors, impressions,
+  viewability, and verification resources from every wrapper—not merely fetch the final inline ad.
+- **Bound wrapper traversal.** Detect cycles, impose depth/time/size limits, resolve relative URLs,
+  honor `followAdditionalWrappers`, and report failures through the applicable VAST error URLs.
+- **Use real media files.** VAST 4 separates executable behavior from `<MediaFile>`. Prefer suitable
+  codec, bitrate, dimensions, and delivery method; retain a high-quality mezzanine for SSAI.
+- **VPAID is retired.** Use OMID/OM SDK for measurement and verification, and SIMID for secure
+  interactivity. Do not treat a VPAID JavaScript media file as the modern path.
+- **Identity and measurement matter.** Preserve `UniversalAdId`, `AdServingId`,
+  `<AdVerifications>`, and `<ViewableImpression>` so deduplication, attribution, and verification
+  remain possible.
+- **Macros are a separate living registry.** Expand tracking and request macros at dispatch time,
+  with the correct encoding and unavailable-value rules; do not blindly string-replace XML.
+- **Pods and scheduling are player policy.** VAST can describe sequenced ads, but VMAP or another
+  scheduling layer determines when breaks occur. Wrapper flattening must not silently choose among
+  multiple ads.
+- **CTV is evolving.** The 4.4 draft adds CTV Ad Portfolio non-linear formats and standardized QR
+  code signaling. Build this behind explicit capability checks rather than assuming universal
+  support.
+
+Primary references:
+
+- [IAB Tech Lab VAST repository and schemas](https://github.com/InteractiveAdvertisingBureau/VAST)
+- [VAST 4.3 specification](https://github.com/InteractiveAdvertisingBureau/VAST4.x/blob/main/4.3.md)
+- [VAST 4 macro registry](https://github.com/InteractiveAdvertisingBureau/VAST/tree/master/vast4macros)
+- [Official VAST samples](https://github.com/InteractiveAdvertisingBureau/VAST_Samples)
+
+## Scope of this package
+
+`vast-inliner` handles the transport and deterministic inheritance part of wrapper processing. It
+does not select media, fire tracking pixels, expand macros, execute OMID/SIMID resources, validate
+against an XSD, choose ads from a pod, enforce blocked categories, or implement fallback policy.
+Those decisions require player capabilities and request context and should remain visible to the
+caller.
+
+| Wrapper data | Behavior |
+| --- | --- |
+| Impressions and errors | Preserved on the inline ad |
+| Linear tracking events | Added to the inline linear creative |
+| Linear click/custom tracking | Preserved; inline click-through is never replaced |
+| Icon, nonlinear, and companion click tracking | Matched by program, ID, or stable position |
+| Viewable-impression URLs | Combined into the inline viewability container |
+| Ad verification resources | Combined for downstream OMID/verification handling |
+| Extensions | Preserved without interpreting vendor-specific payloads |
+| Media, interactive files, click-throughs, and ad parameters | Kept from the inline creative |
+
 ## Install
 
 ```sh
@@ -43,10 +103,9 @@ const xml = await vastInliner("https://ads.example/vast.xml", {
 
 Relative `VASTAdTagURI` values resolve against the response URL. Cycles, malformed XML, HTTP errors, timeouts, and excessive wrapper depth reject with an error.
 
-Wrapper inheritance covers impressions, errors, linear tracking, click tracking, custom clicks,
-icon click tracking, nonlinear click tracking, companion click tracking, viewable-impression URIs,
-ad verifications, and extensions. Inline click-through destinations and media resources are never
-replaced. The `followAdditionalWrappers` control is enforced.
+The `followAdditionalWrappers` control is enforced. `allowMultipleAds`, `fallbackOnNoAd`, ad-pod
+selection, blocked-category evaluation, macro expansion, and error-pixel dispatch remain caller
+policy; flattening them without playback context would be incorrect.
 
 ## Development
 
