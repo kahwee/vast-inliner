@@ -1,8 +1,28 @@
 # vast-inliner
 
 [![CI](https://github.com/kahwee/vast-inliner/actions/workflows/ci.yml/badge.svg)](https://github.com/kahwee/vast-inliner/actions/workflows/ci.yml)
+[![Maintained by KahWee Teng](https://img.shields.io/badge/maintainer-KahWee_Teng-1f6feb)](https://kahwee.com)
 
 Resolve a chain of VAST wrappers into one inline VAST document. Wrapper impressions, errors, and linear tracking events are copied into the final inline ad.
+
+## Why I built this
+
+I’m [KahWee Teng](https://kahwee.com). I have worked on both sides of programmatic advertising:
+at a demand-side platform (DSP), where advertisers buy inventory, and at a supply-side platform
+(SSP), where publishers make inventory available and protect its value.
+
+That experience made VAST wrappers feel less like abstract XML and more like the connective tissue
+between companies that have different responsibilities but must agree on one playback outcome.
+A single ad request may pass through buyers, exchanges, sellers, verification vendors, and creative
+hosts before reaching a player. Each wrapper can add measurement, errors, viewability signals, and
+commercial accountability. Dropping one layer can mean missing attribution, incorrect billing,
+lost publisher revenue, or a player that simply fails to render an ad.
+
+I originally created `vast-inliner` to make those wrapper chains inspectable and usable as one
+document. The modern version keeps that narrow role: resolve the chain safely, preserve the signals
+that accumulated along the way, and leave playback and business-policy decisions to the caller.
+It reflects a practical lesson from working across DSP and SSP systems: interoperability is not
+just parsing XML; it is preserving everyone’s intent without hiding failure.
 
 ## VAST today
 

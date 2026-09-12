@@ -57,7 +57,11 @@
     "type": "git",
     "url": "git+https://github.com/kahwee/vast-inliner.git"
   },
-  "author": "KahWee Teng <t@kw.sg>",
+  "author": {
+    "name": "KahWee Teng",
+    "email": "t@kw.sg",
+    "url": "https://kahwee.com"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/kahwee/vast-inliner/issues"
