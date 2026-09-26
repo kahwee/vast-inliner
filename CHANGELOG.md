@@ -1,3 +1,8 @@
+## 2.0.2 (unreleased)
+
+- Align Vitest and V8 coverage on 5.0.2.
+- Add a self-contained fetch-injection example for local wrapper resolution.
+
 # v2.0.1 -- 2026-09-12
 
 * Expand the maintainer story and package metadata with KahWee Teng's DSP and SSP background.

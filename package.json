@@ -1,6 +1,6 @@
 {
   "name": "vast-inliner",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Resolve VAST wrapper chains into a single inline VAST document",
   "type": "module",
   "sideEffects": false,
@@ -43,11 +43,11 @@
     "@arethetypeswrong/cli": "0.18.5",
     "@biomejs/biome": "2.5.14",
     "@types/node": "22.20.2",
-    "@vitest/coverage-v8": "5.0.1",
+    "@vitest/coverage-v8": "5.0.2",
     "publint": "0.3.24",
     "tsdown": "0.23.0",
     "typescript": "7.0.2",
-    "vitest": "5.0.1"
+    "vitest": "5.0.2"
   },
   "engines": {
     "node": ">=22"
