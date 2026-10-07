@@ -70,3 +70,7 @@ bun run check
 
 The check covers formatting, lint, types, tests with coverage, ESM/CommonJS
 builds, package exports, and dependency audit.
+
+## CI maintenance
+
+[GitHub Actions maintenance](.github/ACTIONS.md) covers workflows, parallel checks, action versions, and weekly updates.
