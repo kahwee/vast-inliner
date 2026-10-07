@@ -19,4 +19,15 @@ jobs:
         with:
           bun-version-file: package.json
       - run: bun install --frozen-lockfile
-      - run: bun run check
+      # Preserve every check; package validation depends on the completed build.
+      - parallel:
+          - name: Formatting and lint
+            run: bun run format:check && bun run lint
+          - name: Type check
+            run: bun run typecheck
+          - name: Tests with coverage
+            run: bun run test
+          - name: Audit
+            run: bun audit
+      - name: Build and verify package
+        run: bun run build && bun run package:check

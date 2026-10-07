@@ -1,5 +1,6 @@
 ## 2.0.2 (unreleased)
 
+- Update the locked source-map-js development dependency to 1.2.2 to address its denial-of-service advisory.
 - Align Vitest and V8 coverage on 5.0.2.
 - Add a self-contained fetch-injection example for local wrapper resolution.
 
