@@ -15,6 +15,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7.0.1
+      - name: Test release metadata guard
+        run: node --test scripts/release-check.test.mjs
+
       - uses: oven-sh/setup-bun@v2.2.0
         with:
           bun-version-file: package.json
