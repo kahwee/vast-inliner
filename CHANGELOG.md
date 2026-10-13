@@ -1,3 +1,7 @@
+## 2.0.3 (unreleased)
+
+- Refresh tsdown to 0.23.1 and align Vitest/V8 coverage on 5.0.4; preserve Node 22 compatibility and both ESM/CommonJS entry points.
+
 ## 2.0.2 (unreleased)
 
 - Update compatible development tooling and refresh dependency security fixes.
