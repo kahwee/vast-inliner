@@ -27,13 +27,14 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "check": "bun run format:check && bun run typecheck && bun run test && bun run build && bun run package:check && bun audit",
+    "check": "bun run check:source && bun run build && bun run package:check && bun audit",
     "format": "bun fmt .",
     "format:check": "bun fmt --check .",
     "package:check": "publint && attw --pack .",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "typecheck": "bun --check --tsconfig-override=tsconfig.json"
+    "typecheck": "bun --check --tsconfig-override=tsconfig.json",
+    "check:source": "bun run --parallel format:check typecheck test"
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.9.12"

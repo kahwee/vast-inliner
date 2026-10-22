@@ -81,3 +81,10 @@ Bun 1.4.4 owns formatting (`bun run format`, `bun run format:check`) and type ch
 (`bun run typecheck`). Biome has been removed. Bun formatting is not a replacement
 for Biome’s semantic lint rules; tests, strict type checks, and package builds remain
 the verification gates. TypeScript remains installed for declaration generation.
+
+`bun run check:source` runs formatting, Bun type checking, and tests in parallel.
+`bun run check` waits for those checks before building package artifacts.
+
+On the session’s Linux executor, the median of three project-check runs was
+0.164s with Bun versus 0.718s with `bun x --no-install tsc --noEmit`.
+These include command startup and describe this checkout, not a CI speed guarantee.
