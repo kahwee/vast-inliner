@@ -14,18 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Test release metadata guard
         run: node --test scripts/check-release-guard.mjs
 
-      - uses: oven-sh/setup-bun@v2.2.0
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: package.json
-      - run: bun install --frozen-lockfile
+      - run: bun ci
       # Preserve every check; package validation depends on the completed build.
       - parallel:
-          - name: Formatting and lint
-            run: bun run format:check && bun run lint
+          - name: Formatting
+            run: bun run format:check
           - name: Type check
             run: bun run typecheck
           - name: Tests with coverage

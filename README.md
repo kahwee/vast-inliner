@@ -38,15 +38,15 @@ contacting an ad server. Injecting `fetch` makes traversal and merging reproduci
 
 ## Options
 
-| Option | Purpose |
-| --- | --- |
-| `serialize` | Return XML text instead of a `Document` |
-| `timeout` | Per-request timeout in milliseconds |
-| `maxDepth` | Maximum wrapper depth (default: 10) |
-| `maxResponseBytes` | Decoded response limit (default: 5 MB) |
-| `withCredentials` | Send cross-origin browser credentials |
-| `headers`, `signal` | Fetch request controls |
-| `fetch` | Inject a Fetch-compatible function |
+| Option              | Purpose                                 |
+| ------------------- | --------------------------------------- |
+| `serialize`         | Return XML text instead of a `Document` |
+| `timeout`           | Per-request timeout in milliseconds     |
+| `maxDepth`          | Maximum wrapper depth (default: 10)     |
+| `maxResponseBytes`  | Decoded response limit (default: 5 MB)  |
+| `withCredentials`   | Send cross-origin browser credentials   |
+| `headers`, `signal` | Fetch request controls                  |
+| `fetch`             | Inject a Fetch-compatible function      |
 
 ## Boundaries
 
@@ -70,9 +70,14 @@ bun install --frozen-lockfile
 bun run check
 ```
 
-The check covers formatting, lint, types, tests with coverage, ESM/CommonJS
+The check covers formatting, types, tests with coverage, ESM/CommonJS
 builds, package exports, and dependency audit.
 
 ## CI maintenance
 
 [GitHub Actions maintenance](.github/ACTIONS.md) covers workflows, parallel checks, action versions, and weekly updates.
+
+Bun 1.4.4 owns formatting (`bun run format`, `bun run format:check`) and type checking
+(`bun run typecheck`). Biome has been removed. Bun formatting is not a replacement
+for Biome’s semantic lint rules; tests, strict type checks, and package builds remain
+the verification gates. TypeScript remains installed for declaration generation.

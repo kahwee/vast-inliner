@@ -4,26 +4,28 @@ This guide describes the checked-in workflows. Follow each linked YAML file for 
 
 ## Workflows
 
-| Workflow | Events | Jobs |
-| --- | --- | --- |
+| Workflow                   | Events                 | Jobs   |
+| -------------------------- | ---------------------- | ------ |
 | [ci.yml](workflows/ci.yml) | `push`, `pull_request` | `test` |
 
 ## Parallel steps
 
 Independent checks use GitHub Actions [native parallel steps](https://github.blog/changelog/2026-06-25-actions-steps-can-now-be-run-in-parallel/). The following groups run concurrently within a job:
 
-- [ci.yml](workflows/ci.yml), job `test`: `Formatting and lint`; `Type check`; `Tests with coverage`; `Audit`.
+- [ci.yml](workflows/ci.yml), job `test`: `Formatting`; `Type check`; `Tests with coverage`; `Audit`.
 
 Steps after a group wait for it to finish. Keep prerequisites before the group and dependent build, package, or deployment work afterward. Do not run commands that overwrite the same build directory or coverage output together. Parallel steps share the job workspace; they do not provide separate machines.
 
 ## Action versions
 
-Versions below match the current workflow and composite-action references. SHA-pinned actions remain pinned; compare their commit with the upstream stable release when updating.
+Verified against upstream stable releases on 2026-10-22. Workflow, composite-action,
+and release-proposal references use immutable commit pins with version comments.
 
-| Action | Reference |
-| --- | --- |
-| [actions/checkout](https://github.com/actions/checkout) | `v7.0.1` |
-| [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun) | `v2.2.0` |
+| Action                                                      | Stable release | Commit                                     |
+| ----------------------------------------------------------- | -------------- | ------------------------------------------ |
+| [actions/checkout](https://github.com/actions/checkout)     | `v7.0.1`       | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
+| [actions/setup-node](https://github.com/actions/setup-node) | `v7.1.0`       | `949feb2413d6458794dcd2491c4babbbce0c15c1` |
+| [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun)   | `v2.2.0`       | `0c5077e51419868618aeaa5fe8019c62421857d6` |
 
 ## Greenkeeping
 
@@ -36,3 +38,13 @@ Versions below match the current workflow and composite-action references. SHA-p
 5. Refresh this guide when workflows, action references, or parallel groups change.
 
 Use workflow concurrency to cancel superseded check runs where appropriate. Deployment and release cancellation have different consequences: preserve the workflow’s existing policy rather than copying check-run settings blindly. Repository permissions and job-level overrides are defined in the linked YAML files.
+
+## Bun tooling
+
+Bun 1.4.4 provides native formatting and type checking. CI runs
+`bun run format:check` and `bun run typecheck`; Biome is no longer installed.
+Semantic lint rules previously supplied by Biome are not part of Bun formatting.
+Retain tests, declaration generation, package validation, and audit gates.
+
+Frozen dependency installation uses `bun ci`. Vitest and declaration emitters
+remain where they provide existing coverage and published package artifacts.

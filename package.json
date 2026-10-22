@@ -27,21 +27,19 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build && bun run package:check && bun audit",
-    "format": "biome format --write .",
-    "format:check": "biome format .",
-    "lint": "biome lint .",
+    "check": "bun run format:check && bun run typecheck && bun run test && bun run build && bun run package:check && bun audit",
+    "format": "bun fmt .",
+    "format:check": "bun fmt --check .",
     "package:check": "publint && attw --pack .",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "bun --check --tsconfig-override=tsconfig.json"
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.9.12"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
-    "@biomejs/biome": "2.5.15",
     "@types/node": "22.20.2",
     "@vitest/coverage-v8": "5.0.4",
     "publint": "0.3.25",

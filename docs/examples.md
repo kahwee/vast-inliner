@@ -43,4 +43,3 @@ console.log(xml); // Inline XML containing both impression URLs.
 
 These minimal fixtures demonstrate traversal and merging; they contain no media
 creative. Resolving an impression URL into the XML does not send a tracking request.
-
