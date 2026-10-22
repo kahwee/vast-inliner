@@ -63,7 +63,7 @@ and [official samples](https://github.com/InteractiveAdvertisingBureau/VAST_Samp
 
 ## Develop
 
-Use Bun 1.4.3, matching `package.json` and CI.
+Use Bun 1.4.4, matching `package.json` and CI.
 
 ```sh
 bun install --frozen-lockfile
