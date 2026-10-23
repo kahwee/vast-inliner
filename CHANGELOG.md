@@ -2,12 +2,17 @@
 
 ## Unreleased
 
+- Use isolated Oxc declaration emission for the explicit public API; gate standalone builds with Bun checking and retain package validation. Record a 59.4% artifact-phase reduction with identical emitted files.
+
+- Host existing artifact-build tools under Bun; preserve emitted package formats and declarations. Record three-run build benchmarks and identical-output fingerprints.
+- Refresh compatible dependencies, including available toolchain security patches.
+
 - Run independent source checks in parallel with Bun; keep build and package validation after successful checks.
 
 - Use Bun 1.4.4 for formatting and type checking; remove Biome. Keep TypeScript for declaration output.
 - Pin GitHub Actions to verified stable release commits and use `bun ci` for frozen installs.
 
-- Refresh tsdown to 0.23.1 and align Vitest/V8 coverage on 5.0.4; preserve Node 22 compatibility and both ESM/CommonJS entry points.
+- Refresh tsdown to 0.23.1 and align Vitest/V8 coverage on 5.0.5; preserve Node 22 compatibility and both ESM/CommonJS entry points.
 
 ## 2.0.2 (unreleased)
 

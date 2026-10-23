@@ -1,0 +1,67 @@
+{
+  "repo": "vast-inliner",
+  "base_commit": "684bdaada9489183e780e84fb22c6a9262ca8597",
+  "bun": "1.4.4",
+  "node": "v26.11.1",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "scope": "Artifact build only; both cases use the same updated dependencies; declarations included; installed and OS caches warm",
+  "samples": [
+    {
+      "round": 1,
+      "case": "bun_hosted",
+      "seconds": 2.2726,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 1,
+      "case": "normal",
+      "seconds": 3.6341,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 2,
+      "case": "normal",
+      "seconds": 2.927,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 2,
+      "case": "bun_hosted",
+      "seconds": 2.3709,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 3,
+      "case": "bun_hosted",
+      "seconds": 2.8469,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 3,
+      "case": "normal",
+      "seconds": 3.2823,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    }
+  ],
+  "median_seconds": {
+    "normal": 3.2823,
+    "bun_hosted": 2.3709
+  },
+  "working_tree_modified": true,
+  "baseline_command": "bun run build",
+  "candidate_command": "bun --bun run build",
+  "measurement_date": "2026-10-22",
+  "note": "Commands reference the baseline script before adding explicit Bun-hosted tool invocations. Runtime comparison used identical updated dependencies in both cases."
+}

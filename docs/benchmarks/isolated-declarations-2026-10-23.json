@@ -1,0 +1,67 @@
+{
+  "repo": "vast-inliner",
+  "bun": "1.4.4",
+  "node": "v26.11.1",
+  "scope": "Artifact generation only; same Bun host and updated dependencies; source gate remains outside both measured cases",
+  "samples": [
+    {
+      "round": 1,
+      "case": "oxc",
+      "seconds": 1.4832,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 1,
+      "case": "tsgo",
+      "seconds": 1.716,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 2,
+      "case": "tsgo",
+      "seconds": 1.9526,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 2,
+      "case": "oxc",
+      "seconds": 0.6966,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 3,
+      "case": "oxc",
+      "seconds": 0.5262,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    },
+    {
+      "round": 3,
+      "case": "tsgo",
+      "seconds": 1.6863,
+      "output_sha256": "4d2ac1af7e4f6ee4fdcca94534b2c942f714c2e25875c493525a10f53867baf7",
+      "matches_reference": true,
+      "files": 6
+    }
+  ],
+  "median_seconds": {
+    "tsgo": 1.716,
+    "oxc": 0.6966
+  },
+  "outputs_identical": true,
+  "measurement_date": "2026-10-23",
+  "base_commit": "684bdaada9489183e780e84fb22c6a9262ca8597",
+  "working_tree_modified": true,
+  "platform": "Linux 6.18.55 x64",
+  "baseline_config": "import { defineConfig } from \"tsdown\";\n\nexport default defineConfig({\n  clean: true,\n  dts: true,\n  entry: [\"src/index.ts\"],\n  format: [\"esm\", \"cjs\"],\n  outputOptions: { exports: \"named\" },\n  sourcemap: true,\n  target: \"node22\",\n});\n",
+  "candidate_config": "import { defineConfig } from \"tsdown\";\n\nexport default defineConfig({\n  clean: true,\n  dts: { generator: \"oxc\" },\n  entry: [\"src/index.ts\"],\n  format: [\"esm\", \"cjs\"],\n  outputOptions: { exports: \"named\" },\n  sourcemap: true,\n  target: \"node22\",\n});\n"
+}

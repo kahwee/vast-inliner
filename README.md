@@ -80,7 +80,8 @@ builds, package exports, and dependency audit.
 Bun 1.4.4 owns formatting (`bun run format`, `bun run format:check`) and type checking
 (`bun run typecheck`). Biome has been removed. Bun formatting is not a replacement
 for Biome’s semantic lint rules; tests, strict type checks, and package builds remain
-the verification gates. TypeScript remains installed for declaration generation.
+the verification gates. TypeScript remains installed for editor/tooling consistency. Bun checks semantics;
+the bundler uses its Oxc emitter for the explicitly typed declaration API.
 
 `bun run check:source` runs formatting, Bun type checking, and tests in parallel.
 `bun run check` waits for those checks before building package artifacts.
@@ -88,3 +89,10 @@ the verification gates. TypeScript remains installed for declaration generation.
 On the session’s Linux executor, the median of three project-check runs was
 0.164s with Bun versus 0.718s with `bun x --no-install tsc --noEmit`.
 These include command startup and describe this checkout, not a CI speed guarantee.
+
+See [build performance](docs/build-performance.md) for the Bun-hosted build,
+measured artifact timings, output verification, and benchmark scope.
+
+Standalone `bun run build` checks types before writing artifacts. `build:artifacts`
+uses the fast declaration emitter and requires a successful source gate first.
+See [declaration benchmarks](docs/build-performance.md#isolated-declaration-emission).

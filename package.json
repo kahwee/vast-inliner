@@ -26,15 +26,16 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsdown",
-    "check": "bun run check:source && bun run build && bun run package:check && bun audit",
+    "build": "bun run typecheck && bun run build:artifacts",
+    "check": "bun run check:source && bun run build:artifacts && bun run package:check && bun audit",
     "format": "bun fmt .",
     "format:check": "bun fmt --check .",
     "package:check": "publint && attw --pack .",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "bun --check --tsconfig-override=tsconfig.json",
-    "check:source": "bun run --parallel format:check typecheck test"
+    "check:source": "bun run --parallel format:check typecheck test",
+    "build:artifacts": "bun --bun tsdown"
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.9.12"
@@ -42,11 +43,11 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
     "@types/node": "22.20.2",
-    "@vitest/coverage-v8": "5.0.4",
+    "@vitest/coverage-v8": "5.0.5",
     "publint": "0.3.25",
     "tsdown": "0.23.1",
     "typescript": "7.0.2",
-    "vitest": "5.0.4"
+    "vitest": "5.0.5"
   },
   "engines": {
     "node": ">=22"

@@ -25,6 +25,7 @@ and release-proposal references use immutable commit pins with version comments.
 | ----------------------------------------------------------- | -------------- | ------------------------------------------ |
 | [actions/checkout](https://github.com/actions/checkout)     | `v7.0.1`       | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
 | [actions/setup-node](https://github.com/actions/setup-node) | `v7.1.0`       | `949feb2413d6458794dcd2491c4babbbce0c15c1` |
+| [actions/cache](https://github.com/actions/cache)           | `v6.1.0`       | `55cc8345863c7cc4c66a329aec7e433d2d1c52a9` |
 | [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun)   | `v2.2.0`       | `0c5077e51419868618aeaa5fe8019c62421857d6` |
 
 ## Greenkeeping
@@ -54,3 +55,12 @@ remain where they provide existing coverage and published package artifacts.
 Local `check:source` uses Bun’s parallel script runner for formatting, project
 checking, and tests. GitHub keeps these as independent parallel steps so failures
 remain visible. Builds and package checks wait for the source checks.
+
+Package artifact commands host their existing build tools under Bun. Source gates
+still finish before artifact generation; tests and coverage keep their existing
+runtime. Bun package caches use the default `~/.bun/install/cache` directory.
+See [build performance](../docs/build-performance.md) for the controlled comparison.
+
+The source gate must pass before `build:artifacts`. The artifact command uses
+tsdown’s isolated Oxc declaration emitter; standalone `build` runs Bun type
+checking first. Package checks continue to validate ESM/CommonJS and declarations.
