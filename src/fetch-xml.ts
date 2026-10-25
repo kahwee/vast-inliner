@@ -49,12 +49,14 @@ export async function fetchXml(uri: string, options: FetchXmlOptions = {}): Prom
   });
 
   if (!response.ok) {
+    await response.body?.cancel().catch(() => {});
     throw new Error(`VAST request failed with HTTP ${response.status} for ${response.url || uri}`);
   }
   // Content-Length allows an early rejection; the encoded-size check below remains authoritative
   // because servers can omit or misreport the header.
   const declaredLength = Number(response.headers.get("content-length"));
   if (Number.isFinite(declaredLength) && declaredLength > maxResponseBytes) {
+    await response.body?.cancel().catch(() => {});
     throw new Error(`VAST response exceeds maxResponseBytes (${maxResponseBytes})`);
   }
   const xml = await response.text();

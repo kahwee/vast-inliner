@@ -17,6 +17,32 @@ function mockFetch(documents: Record<string, string>): typeof fetch {
 }
 
 describe("fetchXml", () => {
+  it.each([
+    { status: 404, cancelFails: false },
+    { status: 200, cancelFails: false },
+    { status: 404, cancelFails: true },
+    { status: 200, cancelFails: true },
+  ])(
+    "disposes rejected HTTP $status bodies (cancel failure: $cancelFails)",
+    async ({ status, cancelFails }) => {
+      const cancel = vi.fn(() =>
+        cancelFails ? Promise.reject(new Error("cancel failed")) : undefined,
+      );
+      const response = new Response(new ReadableStream({ cancel }), {
+        status,
+        headers: { "content-length": "100" },
+      });
+
+      await expect(
+        fetchXml("https://ads.test/rejected.xml", {
+          fetch: vi.fn(async () => response) as unknown as typeof fetch,
+          maxResponseBytes: 10,
+        }),
+      ).rejects.toThrow(status === 404 ? "HTTP 404" : "maxResponseBytes");
+      expect(cancel).toHaveBeenCalledOnce();
+    },
+  );
+
   it("parses successful XML responses", async () => {
     const result = await fetchXml("https://ads.test/inline.xml", {
       fetch: mockFetch({ "https://ads.test/inline.xml": inline }),
