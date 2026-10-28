@@ -1,6 +1,7 @@
 ## 2.0.3 (unreleased)
 
-## Unreleased
+- Enforce response-size limits while streaming, preserving split UTF-8 characters and cancelling oversized bodies.
+- Refresh tsdown to 0.23.3 and Node 22 types to 22.20.5; verify both package entry points on Node 22.
 
 - Use isolated Oxc declaration emission for the explicit public API; gate standalone builds with Bun checking and retain package validation. Record a 59.4% artifact-phase reduction with identical emitted files.
 
