@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { runInNewContext } from "node:vm";
 import { describe, expect, it, vi } from "vitest";
 import vastInliner, { Combiner, fetchVastChain, fetchXml, parseXml } from "../src";
 
@@ -17,6 +18,224 @@ function mockFetch(documents: Record<string, string>): typeof fetch {
 }
 
 describe("fetchXml", () => {
+  function responseFromBytes(bytes: Uint8Array): Response {
+    let offset = 0;
+    return new Response(
+      new ReadableStream<Uint8Array>({
+        pull(controller) {
+          if (offset === bytes.length) controller.close();
+          else controller.enqueue(bytes.subarray(offset, ++offset));
+        },
+      }),
+    );
+  }
+
+  it.each(["not bytes", new Uint16Array([1]), new DataView(new ArrayBuffer(1))])(
+    "rejects non-byte stream chunks rather than silently dropping them: %s",
+    async (invalidChunk) => {
+      const cancel = vi.fn();
+      const response = new Response(
+        new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode("<VAST>"));
+            controller.enqueue(invalidChunk);
+            controller.enqueue(new TextEncoder().encode("</VAST>"));
+          },
+          cancel,
+        }),
+      );
+      await expect(
+        fetchXml("https://ads.test/non-byte.xml", {
+          fetch: vi.fn(async () => response) as unknown as typeof fetch,
+        }),
+      ).rejects.toBeInstanceOf(TypeError);
+      expect(cancel).toHaveBeenCalledOnce();
+      expect(response.body?.locked).toBe(false);
+    },
+  );
+
+  it("accepts Uint8Array chunks from another realm", async () => {
+    const bytes = runInNewContext("new Uint8Array([60, 86, 65, 83, 84, 47, 62])");
+    const result = await fetchXml("https://ads.test/other-realm.xml", {
+      fetch: vi.fn(async () => responseFromBytes(bytes)) as unknown as typeof fetch,
+    });
+    expect(result.document.documentElement?.nodeName).toBe("VAST");
+  });
+
+  it("preserves split UTF-8 characters and accepts the exact decoded-byte limit", async () => {
+    const xml = "<VAST>é😀</VAST>";
+    const bytes = new TextEncoder().encode(xml);
+    const result = await fetchXml("https://ads.test/unicode.xml", {
+      fetch: vi.fn(async () => responseFromBytes(bytes)) as unknown as typeof fetch,
+      maxResponseBytes: bytes.byteLength,
+    });
+    expect(result.document.documentElement?.textContent).toBe("é😀");
+    await expect(
+      fetchXml("https://ads.test/unicode.xml", {
+        fetch: vi.fn(async () => responseFromBytes(bytes)) as unknown as typeof fetch,
+        maxResponseBytes: bytes.byteLength - 1,
+      }),
+    ).rejects.toThrow("maxResponseBytes");
+  });
+
+  it("retains Response.text UTF-8 BOM and malformed-byte semantics", async () => {
+    const encoder = new TextEncoder();
+    const bytes = new Uint8Array([
+      0xef,
+      0xbb,
+      0xbf,
+      ...encoder.encode("<VAST>"),
+      0xff,
+      ...encoder.encode("</VAST>"),
+    ]);
+    const expected = await responseFromBytes(bytes).text();
+    const limit = encoder.encode(expected).byteLength;
+    const result = await fetchXml("https://ads.test/decoded.xml", {
+      fetch: vi.fn(async () => responseFromBytes(bytes)) as unknown as typeof fetch,
+      maxResponseBytes: limit,
+    });
+    expect(result.document.documentElement?.textContent).toBe("�");
+    await expect(
+      fetchXml("https://ads.test/decoded.xml", {
+        fetch: vi.fn(async () => responseFromBytes(bytes)) as unknown as typeof fetch,
+        maxResponseBytes: limit - 1,
+      }),
+    ).rejects.toThrow("maxResponseBytes");
+  });
+
+  it("counts a final incomplete UTF-8 sequence flushed at EOF", async () => {
+    const bytes = new Uint8Array([...new TextEncoder().encode("<VAST/>"), 0xe2]);
+    const response = responseFromBytes(bytes);
+    await expect(
+      fetchXml("https://ads.test/incomplete.xml", {
+        fetch: vi.fn(async () => response) as unknown as typeof fetch,
+        maxResponseBytes: bytes.byteLength,
+      }),
+    ).rejects.toThrow("maxResponseBytes");
+    expect(response.body?.locked).toBe(false);
+  });
+
+  it("preserves the size error when canceling a large single chunk fails", async () => {
+    const cancel = vi.fn(async () => {
+      throw new Error("cancel failed");
+    });
+    const response = new Response(
+      new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode("x".repeat(40_000)));
+        },
+        cancel,
+      }),
+    );
+    await expect(
+      fetchXml("https://ads.test/large-chunk.xml", {
+        fetch: vi.fn(async () => response) as unknown as typeof fetch,
+        maxResponseBytes: 20_000,
+      }),
+    ).rejects.toThrow("maxResponseBytes");
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(response.body?.locked).toBe(false);
+  });
+
+  it("propagates body read failures and releases its reader", async () => {
+    const failure = new Error("stream failed");
+    const response = new Response(
+      new ReadableStream({
+        pull(controller) {
+          controller.error(failure);
+        },
+      }),
+    );
+    await expect(
+      fetchXml("https://ads.test/broken-stream.xml", {
+        fetch: vi.fn(async () => response) as unknown as typeof fetch,
+      }),
+    ).rejects.toBe(failure);
+    expect(response.body?.locked).toBe(false);
+  });
+
+  it("preserves null-body parsing and consumed-body rejection", async () => {
+    await expect(
+      fetchXml("https://ads.test/empty.xml", {
+        fetch: vi.fn(async () => new Response(null)) as unknown as typeof fetch,
+      }),
+    ).rejects.toThrow("Invalid XML");
+    const consumed = new Response("<VAST/>");
+    await consumed.text();
+    await expect(
+      fetchXml("https://ads.test/consumed.xml", {
+        fetch: vi.fn(async () => consumed) as unknown as typeof fetch,
+      }),
+    ).rejects.toBeInstanceOf(TypeError);
+  });
+
+  it("forwards cancellation and propagates an abort during body reading", async () => {
+    const controller = new AbortController();
+    const failure = new DOMException("Caller aborted", "AbortError");
+    let response: Response | undefined;
+    const fetch = vi.fn(async (_input: string | URL | Request, init?: RequestInit) => {
+      response = new Response(
+        new ReadableStream({
+          start(body) {
+            init?.signal?.addEventListener("abort", () => body.error(init.signal?.reason));
+          },
+          pull() {
+            controller.abort(failure);
+          },
+        }),
+      );
+      return response;
+    }) as unknown as typeof globalThis.fetch;
+    await expect(
+      fetchXml("https://ads.test/abort.xml", {
+        fetch,
+        signal: controller.signal,
+        timeout: 5_000,
+        headers: { "x-test": "preserved" },
+        withCredentials: true,
+      }),
+    ).rejects.toBe(failure);
+    expect(fetch).toHaveBeenCalledWith("https://ads.test/abort.xml", {
+      credentials: "include",
+      headers: { "x-test": "preserved" },
+      signal: expect.any(AbortSignal),
+    });
+    expect(response?.body?.locked).toBe(false);
+  });
+
+  it.each([undefined, "1"])(
+    "stops reading oversized streams with Content-Length %s",
+    async (contentLength) => {
+      const chunks = ["<VAST>", "x".repeat(20), "</VAST>"];
+      const cancel = vi.fn();
+      let reads = 0;
+      const body = new ReadableStream<Uint8Array>(
+        {
+          pull(controller) {
+            const chunk = chunks[reads++];
+            if (chunk === undefined) controller.close();
+            else controller.enqueue(new TextEncoder().encode(chunk));
+          },
+          cancel,
+        },
+        { highWaterMark: 0 },
+      );
+      const response = new Response(body, {
+        ...(contentLength ? { headers: { "content-length": contentLength } } : {}),
+      });
+
+      await expect(
+        fetchXml("https://ads.test/stream.xml", {
+          fetch: vi.fn(async () => response) as unknown as typeof fetch,
+          maxResponseBytes: 10,
+        }),
+      ).rejects.toThrow("maxResponseBytes");
+      expect(cancel).toHaveBeenCalledOnce();
+      expect(reads).toBe(2);
+      expect(body.locked).toBe(false);
+    },
+  );
+
   it.each([
     { status: 404, cancelFails: false },
     { status: 200, cancelFails: false },

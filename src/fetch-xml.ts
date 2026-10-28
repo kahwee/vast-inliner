@@ -22,6 +22,52 @@ export interface XmlResponse {
   url: string;
 }
 
+async function readLimitedText(response: Response, maxResponseBytes: number): Promise<string> {
+  if (!response.body) return response.text();
+  if (response.bodyUsed) throw new TypeError("Response body has already been consumed");
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+  const parts: string[] = [];
+  let decodedBytes = 0;
+
+  const append = (text: string): void => {
+    // Match Response.text() followed by UTF-8 encoding, including BOM removal and
+    // replacement characters for malformed bytes, rather than counting wire bytes.
+    decodedBytes += encoder.encode(text).byteLength;
+    if (decodedBytes > maxResponseBytes) {
+      throw new Error(`VAST response exceeds maxResponseBytes (${maxResponseBytes})`);
+    }
+    if (text) parts.push(text);
+  };
+
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (
+        !ArrayBuffer.isView(value) ||
+        Object.prototype.toString.call(value) !== "[object Uint8Array]"
+      ) {
+        throw new TypeError("Response body must contain Uint8Array chunks");
+      }
+      // A custom fetch may supply a large single chunk. Decode bounded slices so
+      // that rejecting it does not first allocate an equally large text string.
+      for (let offset = 0; offset < value.byteLength; offset += 16_384) {
+        append(decoder.decode(value.subarray(offset, offset + 16_384), { stream: true }));
+      }
+    }
+    append(decoder.decode());
+    return parts.join("");
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 /** Fetch and parse one XML document with bounded size, cancellation, and HTTP validation. */
 export async function fetchXml(uri: string, options: FetchXmlOptions = {}): Promise<XmlResponse> {
   const fetcher = options.fetch ?? globalThis.fetch;
@@ -59,10 +105,7 @@ export async function fetchXml(uri: string, options: FetchXmlOptions = {}): Prom
     await response.body?.cancel().catch(() => {});
     throw new Error(`VAST response exceeds maxResponseBytes (${maxResponseBytes})`);
   }
-  const xml = await response.text();
-  if (new TextEncoder().encode(xml).byteLength > maxResponseBytes) {
-    throw new Error(`VAST response exceeds maxResponseBytes (${maxResponseBytes})`);
-  }
+  const xml = await readLimitedText(response, maxResponseBytes);
 
   return {
     document: parseXml(xml),

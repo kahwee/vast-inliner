@@ -48,6 +48,10 @@ contacting an ad server. Injecting `fetch` makes traversal and merging reproduci
 | `headers`, `signal` | Fetch request controls                  |
 | `fetch`             | Inject a Fetch-compatible function      |
 
+The decoded response limit is enforced while reading the body, including when
+`Content-Length` is absent or too small. Reading stops and the stream is canceled
+as soon as the limit is exceeded. UTF-8 characters split across chunks are preserved.
+
 ## Boundaries
 
 The inliner combines applicable wrapper data with the inline ad. It preserves
