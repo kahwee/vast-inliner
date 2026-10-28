@@ -41,3 +41,15 @@ See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
 No publishing action or registry trust was enabled by this change. Run the full
 existing CI after review. Authentication remains untested until a separately
 authorized real release; a package dry run does not validate OIDC exchange.
+
+The inactive proposal serializes package releases with `queue: max`; GitHub holds
+up to 100 pending runs and cancels further arrivals when full. Waiting order does
+not guarantee version order. The archive-aware preflight rejects a new version
+that would downgrade `latest`, and skips an existing version only if the checked
+tarball matches its SHA-512 integrity. A newer `latest` is preserved.
+
+After publishing or an exact-archive rerun, the proposal verifies registry identity,
+integrity and that `latest` is at least the release version. It makes at most six
+reads, five seconds apart, each with a 15-second timeout. Only a missing package or
+version or an older `latest` is retried; other HTTP errors, malformed metadata,
+and identity or integrity mismatches fail immediately. Exhaustion fails the job.
