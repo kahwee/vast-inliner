@@ -1,3 +1,10 @@
+## 3.0.0 (unreleased)
+
+- **Breaking:** support Node.js 24 only (`>=24 <25`); drop Node 22 and do not claim support for Node 25 or 26.
+- Align the build target, Node type declarations, local runtime pin, CI, and inactive publisher proposal with Node 24.
+- Verify the packed ESM/CommonJS exports and TypeScript declarations in an isolated Node 24 consumer without contacting ad servers.
+- Keep the public resolver API and streaming response-limit behavior unchanged; see [migration guidance](docs/migration-v3.md).
+
 ## 2.0.3 (unreleased)
 
 - Enforce response-size limits while streaming, preserving split UTF-8 characters and cancelling oversized bodies.

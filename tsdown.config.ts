@@ -7,5 +7,5 @@ export default defineConfig({
   format: ["esm", "cjs"],
   outputOptions: { exports: "named" },
   sourcemap: true,
-  target: "node22",
+  target: "node24",
 });

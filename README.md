@@ -8,12 +8,15 @@ resources, and extensions so a player can act on the complete result.
 
 ## Install and use
 
+This checkout prepares v3.0.0; npm publication is separate. The registry may
+still serve an older release until v3 is published.
+
 ```sh
 bun add vast-inliner
 ```
 
-Node.js 22+ is supported. The package provides ESM, CommonJS, and TypeScript
-declarations.
+Version 3 supports **Node.js 24 only** (`>=24 <25`). It provides ESM, CommonJS,
+and TypeScript declarations. See [migration to v3](docs/migration-v3.md).
 
 ```ts
 import vastInliner from 'vast-inliner';
@@ -67,7 +70,7 @@ and [official samples](https://github.com/InteractiveAdvertisingBureau/VAST_Samp
 
 ## Develop
 
-Use Bun 1.4.4, matching `package.json` and CI.
+Use Node.js 24.22.1 from `.nvmrc` and Bun 1.4.4, matching CI.
 
 ```sh
 bun install --frozen-lockfile

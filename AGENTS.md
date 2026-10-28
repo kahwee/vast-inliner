@@ -1,7 +1,8 @@
 # VAST Inliner
 
 - Use Bun 1.4.4 and keep `bun.lock` committed; frozen installs use `bun ci`.
-- Preserve Node 22 runtime compatibility and keep `@types/node` on its 22 line.
+- Support Node 24 only (`>=24 <25`); use `.nvmrc`, the Node 24 types line, and
+  the Node 24 build target. Node 22, 25, and 26 are outside the v3 support contract.
 - Run `bun run check` before committing.
 - Preserve the default export and both ESM/CommonJS package entry points.
 - Test wrapper traversal, XML merging, and every new failure mode.
@@ -14,7 +15,8 @@
 - Preserve decoded UTF-8 byte-limit, abort, timeout, and stream cleanup semantics.
   Add injected-stream tests for boundary behavior; never contact real ad servers.
 - Keep independent source checks parallel, then build and validate the package.
-  Build artifacts must finish before `publint` and `attw` checks.
+  Build artifacts must finish before `publint`, `attw`, and isolated packed-package
+  ESM/CommonJS/runtime/declaration checks.
 - Publishing is not active. The proposal in `.github/release-proposals/` requires
   separate workflow and registry-trust approval; see [publishing](docs/actions-publishing.md).
   Do not create tags, releases, or registry publications as maintenance tests.

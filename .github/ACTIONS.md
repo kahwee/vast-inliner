@@ -3,22 +3,24 @@
 ## Verification
 
 [`ci.yml`](workflows/ci.yml) runs on pushes and pull requests to `main`.
-It tests release metadata guards, installs Bun from `package.json`, caches
+It selects Node 24.22.1 from `.nvmrc`, tests release metadata guards, installs Bun from `package.json`, caches
 packages, and performs a frozen `bun ci` installation.
 
 Formatting, Bun type checking, coverage, and dependency audit run in parallel.
-All must pass before the package build and ESM/CommonJS declaration checks.
+All must pass before the package build, ESM/CommonJS declaration checks, and
+isolated packed-package consumers on Node 24.
 Parallel steps share a workspace; do not overlap artifact generation with checks
 that read `dist`. The workflow retains read-only contents access and cancels
 superseded verification runs.
 
 ## Stable immutable pins
 
-| Action                                                                        | Release | Commit                                     |
-| ----------------------------------------------------------------------------- | ------- | ------------------------------------------ |
-| [actions/checkout](https://github.com/actions/checkout/releases/tag/v7.0.1)   | v7.0.1  | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
-| [actions/cache](https://github.com/actions/cache/releases/tag/v6.1.0)         | v6.1.0  | `55cc8345863c7cc4c66a329aec7e433d2d1c52a9` |
-| [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun/releases/tag/v2.2.0) | v2.2.0  | `0c5077e51419868618aeaa5fe8019c62421857d6` |
+| Action                                                                          | Release | Commit                                     |
+| ------------------------------------------------------------------------------- | ------- | ------------------------------------------ |
+| [actions/checkout](https://github.com/actions/checkout/releases/tag/v7.0.1)     | v7.0.1  | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
+| [actions/setup-node](https://github.com/actions/setup-node/releases/tag/v7.1.0) | v7.1.0  | `949feb2413d6458794dcd2491c4babbbce0c15c1` |
+| [actions/cache](https://github.com/actions/cache/releases/tag/v6.1.0)           | v6.1.0  | `55cc8345863c7cc4c66a329aec7e433d2d1c52a9` |
+| [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun/releases/tag/v2.2.0)   | v2.2.0  | `0c5077e51419868618aeaa5fe8019c62421857d6` |
 
 [Dependabot](dependabot.yml) checks Actions weekly. Verify upstream release
 commits and runner requirements, preserve every gate and workflow permission,
@@ -35,6 +37,6 @@ source gate. See [build performance](../docs/build-performance.md) for historica
 measurements, not a CI speed guarantee.
 
 There is no active publisher. The [release proposal](release-proposals/publish.yml)
-and its setup-node pin remain outside `.github/workflows`. Activation and npm
+remains outside `.github/workflows` and uses the same `.nvmrc` runtime. Activation and npm
 registry trust require separate approval; see [publishing](../docs/actions-publishing.md).
 Package checks and dry runs do not establish registry authentication.

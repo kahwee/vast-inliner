@@ -1,5 +1,9 @@
 # Actions publishing
 
+The prepared package is v3.0.0 for Node 24 only. The inactive proposal reads
+`.nvmrc`; its runtime must stay aligned with the checked package. The older
+v2.0.3 publication candidate is superseded, not a release target.
+
 The release guard validates stable `v<package.json version>` tags, refuses private
 packages and mismatched npm lock metadata, and stops on registry errors. A 200
 response means the version is immutable; it never forces another upload.
